@@ -58,7 +58,7 @@ const FileUploader = (props: PropsType) => {
   }
 
   return (
-    <ScrollView style={{ flex: 1, padding: 6 }}>
+    <ScrollView style={{ flex: 1, padding: 126 }}>
       <Button title="Выбрать документ (PDF)" onPress={pickDocument} />
       <Button title="Выбрать изображение" onPress={pickImage} />
 
