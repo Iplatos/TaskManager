@@ -7,22 +7,20 @@ const MapForTask = (props: any) => {
   const { markerLocation, setMarkerLocation } = props
 
   const [userLocation, setUserLocation] = useState<any>(null)
-  const mapRef = useRef<MapView>(null) // Ссылка на MapView
+  const mapRef = useRef<MapView>(null)
 
-  // Загружаем местоположение при монтировании компонента
   useEffect(() => {
     const fetchLocation = async () => {
       const location = await getUserLocation()
       if (location) {
         setUserLocation(location)
-        setMarkerLocation(location) // Устанавливаем начальные координаты маркера
+        setMarkerLocation(location)
       }
     }
 
     fetchLocation()
   }, [setMarkerLocation])
 
-  // Получение текущего местоположения
   const getUserLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync()
     if (status !== 'granted') {
@@ -37,10 +35,9 @@ const MapForTask = (props: any) => {
     }
   }
 
-  // Обработчик клика по карте
   const handleMapPress = (event: any) => {
     const newCoords = event.nativeEvent.coordinate
-    setMarkerLocation(newCoords) // Обновляем состояние с новыми координатами
+    setMarkerLocation(newCoords)
 
     if (mapRef.current) {
       mapRef.current.animateToRegion(
@@ -50,7 +47,7 @@ const MapForTask = (props: any) => {
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         },
-        1000 // Время анимации (мс)
+        1000
       )
     }
   }
@@ -60,20 +57,19 @@ const MapForTask = (props: any) => {
       {userLocation ? (
         <MapView
           style={styles.map}
-          ref={mapRef} // Ссылка на карту
+          ref={mapRef}
           region={{
             latitude: userLocation.latitude,
             longitude: userLocation.longitude,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           }}
-          onPress={handleMapPress} // Обработчик клика по карте
+          onPress={handleMapPress}
         >
-          {/* Маркер текущего местоположения */}
           <Marker
             coordinate={markerLocation}
-            title="Мое местоположение"
-            description="Вы находитесь здесь"
+            title="My location"
+            description="You are here"
             draggable
           />
         </MapView>
@@ -85,7 +81,7 @@ const MapForTask = (props: any) => {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { width: 360, height: 300 },
   map: { flex: 1 },
 })
 
