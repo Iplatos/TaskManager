@@ -19,6 +19,11 @@ import FileUploader from './FileUploader'
 import MapForTask from './MapForTask'
 import Header from './Header'
 import { DatePickerComponent } from './DatePicker'
+import MapForCreatedTask from './MapForCreatedTasks'
+import * as Notifications from 'expo-notifications'
+import TaskComponent from './TaskNotivication'
+import History from './History'
+import { scheduleNotification } from './notifications'
 
 export default function App() {
   const [markerLocation, setMarkerLocation] = useState<any>(null)
@@ -28,9 +33,10 @@ export default function App() {
   const [taskDescription, setTaskDescription] = useState('')
   const [locationDescription, setLocationDescription] = useState('')
   const [isConnected, setIsConnected] = useState<boolean>(true)
-  const [showCreateTaskBlock, setShowCreateTaskBlock] = useState(false)
+  const [showCreateTaskBlock, setShowCreateTaskBlock] = useState(true)
   const [date, setDate] = useState(new Date())
   const [showMap, setShowMap] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
   useEffect(() => {
     loadTasksFromStorage()
     const unsubscribe = NetInfo.addEventListener(async (state) => {
@@ -44,6 +50,15 @@ export default function App() {
     return () => unsubscribe()
   }, [])
   console.log('date меняется жу ', date.toISOString())
+  useEffect(() => {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    })
+  }, [])
 
   const deleteTask = async (taskId: string) => {
     try {
@@ -139,6 +154,21 @@ export default function App() {
       await syncTasksWithServer()
     }
 
+    console.log(`Дедлайн задачи: ${task.deadLine}`)
+    console.log(`Текущее время: ${new Date().toISOString()}`)
+
+    const taskDate = new Date(task.deadLine)
+    const notificationTime = new Date(taskDate.getTime() - 30 * 60000)
+
+    if (notificationTime > new Date()) {
+      await scheduleNotification(task.title, notificationTime)
+      console.log(`Уведомление для задачи "${task.title}" запланировано на:`, notificationTime)
+    } else {
+      console.log(
+        `Уведомление для задачи "${task.title}" не запланировано, так как время уже прошло.`
+      )
+    }
+
     setTaskTitle('')
     setTaskDescription('')
     setLocationDescription('')
@@ -176,23 +206,10 @@ export default function App() {
     }
   }
   const deadlineCorrectFormat = (isoString: string) => {
-    console.log('vot taki', isoString)
-
-    if (!isoString) return 'Invalid Date'
-
     const dateFromISO = new Date(isoString)
-    if (isNaN(dateFromISO.getTime())) return 'Iфыnvalid Date'
-
-    const day = dateFromISO.getDate()
-    const month = dateFromISO.getMonth() + 1 // Месяцы начинаются с 0
-    const year = dateFromISO.getFullYear()
-    const hours = dateFromISO.getHours()
-    const minutes = dateFromISO.getMinutes()
-
-    // Форматируем дату
-    return `${day < 10 ? '0' + day : day}.${month < 10 ? '0' + month : month}.${year} ${
-      hours < 10 ? '0' + hours : hours
-    }:${minutes < 10 ? '0' + minutes : minutes}`
+    return `${dateFromISO.getDate()}/${dateFromISO.getMonth() + 1}/${dateFromISO.getFullYear()} ${
+      dateFromISO.getHours() < 10 ? '0' + dateFromISO.getHours() : dateFromISO.getHours()
+    }:${dateFromISO.getMinutes() < 10 ? '0' + dateFromISO.getMinutes() : dateFromISO.getMinutes()}`
   }
 
   return (
@@ -200,11 +217,20 @@ export default function App() {
       <Header
         showCreateTaskBlock={showCreateTaskBlock}
         setShowCreateTaskBlock={setShowCreateTaskBlock}
+        setShowHistory={setShowHistory}
+        showHistory={showHistory}
       />
-
+      <TaskComponent tasks={tasks} />
       <View style={styles.container}>
         {showCreateTaskBlock && (
-          <View style={{ backgroundColor: 'green' }}>
+          <View
+            style={{
+              backgroundColor: 'yellow',
+
+              paddingTop: 30,
+              borderRadius: 5,
+            }}
+          >
             <TextInput
               placeholder="Add title"
               value={taskTitle}
@@ -256,77 +282,82 @@ export default function App() {
             )}
           </View>
         )}
-        <FlatList
-          data={tasks}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View
-              key={item.id}
-              style={{
-                marginVertical: 10,
-                backgroundColor: 'red',
-                borderWidth: 1,
-                borderColor: 'black',
-                borderStyle: 'solid',
-                borderRadius: 5,
-              }}
-            >
-              <Text style={{ textAlign: 'center', marginVertical: 10 }}>Title:{item.title}</Text>
-              <Text style={{ marginVertical: 5, marginLeft: 20 }}>
-                Description:{item.description}
-              </Text>
-              <Text style={{ marginVertical: 5, marginLeft: 20 }}>
-                Location:{item.locationDescription}
-              </Text>
 
-              <Text style={{ marginVertical: 5, marginLeft: 20, textAlign: 'center' }}>
-                {item.synced ? 'Synchronized' : 'Not Synchronized'}
-              </Text>
-              <Text style={{ marginVertical: 5, marginLeft: 20 }}>
-                Deadline: {deadlineCorrectFormat(item.deadLine)}
-              </Text>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={{ marginVertical: 10, marginLeft: 20 }}>Location on Map :</Text>
-                {item.markerLocation ? (
-                  <Image
-                    style={{
-                      width: 40,
-                      height: 40,
-                      paddingBottom: 0,
-                    }}
-                    source={require('./assets/location.png')}
-                    resizeMode="contain"
-                  />
-                ) : (
-                  <Text style={{ marginVertical: 5, marginLeft: 20 }}>No</Text>
-                )}
-              </View>
+        {!showHistory ? (
+          <FlatList
+            data={tasks}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View
+                key={item.id}
+                style={{
+                  marginBottom: 10,
+                  backgroundColor: 'red',
+                  borderWidth: 1,
+                  borderColor: 'black',
+                  borderStyle: 'solid',
+                  borderRadius: 5,
+                }}
+              >
+                <Text style={{ textAlign: 'center', marginVertical: 10 }}>Title:{item.title}</Text>
+                <Text style={{ marginVertical: 5, marginLeft: 20 }}>
+                  Description:{item.description}
+                </Text>
+                <Text style={{ marginVertical: 5, marginLeft: 20 }}>
+                  Location:{item.locationDescription}
+                </Text>
 
-              {item.file && item.file.length > 0 && item.file[0].type === 'image' ? (
-                <ScrollView horizontal={true} style={{ marginTop: 10 }}>
-                  {item.file.map((file, index) => (
+                <Text style={{ marginVertical: 5, marginLeft: 20, textAlign: 'center' }}>
+                  {item.synced ? 'Synchronized' : 'Not Synchronized'}
+                </Text>
+                <Text style={{ marginVertical: 5, marginLeft: 20 }}>
+                  Deadline: {deadlineCorrectFormat(item.deadLine)}
+                </Text>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text style={{ marginVertical: 10, marginLeft: 20 }}>Location on Map :</Text>
+                  {item.markerLocation ? (
                     <Image
-                      key={index}
                       style={{
-                        width: 100,
-                        height: 100,
-                        marginRight: 10,
+                        width: 40,
+                        height: 40,
+                        paddingBottom: 0,
                       }}
-                      source={{ uri: file.uri }}
+                      source={require('./assets/location.png')}
                       resizeMode="contain"
                     />
-                  ))}
-                </ScrollView>
-              ) : (
-                <Text>No Picture</Text>
-              )}
+                  ) : (
+                    <Text style={{ marginVertical: 10, marginLeft: 20 }}>No</Text>
+                  )}
+                </View>
 
-              <TouchableOpacity onPress={() => deleteTask(item.id)}>
-                <Text>Delete</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        />
+                {item.file && item.file.length > 0 && item.file[0].type === 'image' ? (
+                  <ScrollView horizontal={true} style={{ marginTop: 10 }}>
+                    {item.file.map((file, index) => (
+                      <Image
+                        key={index}
+                        style={{
+                          width: 100,
+                          height: 100,
+                          marginRight: 10,
+                        }}
+                        source={{ uri: file.uri }}
+                        resizeMode="contain"
+                      />
+                    ))}
+                  </ScrollView>
+                ) : (
+                  <Text>No Picture</Text>
+                )}
+                <MapForCreatedTask location={item.location} />
+                <TouchableOpacity onPress={() => deleteTask(item.id)}>
+                  <Text>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+        ) : (
+          <History tasks={tasks} />
+        )}
         {!isConnected && <Text style={{ color: 'red' }}>Connection error</Text>}
         <StatusBar style="auto" />
       </View>
