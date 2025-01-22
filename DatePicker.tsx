@@ -46,6 +46,7 @@ export const DatePickerComponent = (props: DatePickerPropsType) => {
           display="default"
           onChange={onChange}
           minimumDate={new Date()}
+          themeVariant="dark"
           locale="ru"
         />
       )}
@@ -66,7 +67,6 @@ const styles = StyleSheet.create({
     width: 150,
     height: 40,
     borderRadius: 10,
-    marginBottom: 14,
     borderWidth: 1,
     borderColor: 'black',
     borderStyle: 'solid',
