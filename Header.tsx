@@ -3,19 +3,26 @@ import { Button, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-n
 type HeaderPropsType = {
   showCreateTaskBlock: boolean
   setShowCreateTaskBlock: (showCreateTaskBlock: boolean) => void
+  showHistory: boolean
+  setShowHistory: (showHistory: boolean) => void
 }
 
 const Header = (props: HeaderPropsType) => {
-  const { setShowCreateTaskBlock, showCreateTaskBlock } = props
+  const { setShowCreateTaskBlock, showCreateTaskBlock, showHistory, setShowHistory } = props
+  const onHistoryClick = () => {
+    setShowHistory(!showHistory)
+    setShowCreateTaskBlock(false)
+  }
+  const onButtonCreateTaskBlockClick = () => {
+    setShowHistory(false)
+    setShowCreateTaskBlock(!showCreateTaskBlock)
+  }
 
   return (
     <View style={styles.header}>
       <Text style={styles.h1}>To-do List</Text>
 
-      <TouchableOpacity
-        onPress={() => setShowCreateTaskBlock(!showCreateTaskBlock)}
-        style={styles.button}
-      >
+      <TouchableOpacity onPress={onButtonCreateTaskBlockClick} style={styles.button}>
         {showCreateTaskBlock ? (
           <Image
             style={styles.headerImage}
@@ -24,6 +31,12 @@ const Header = (props: HeaderPropsType) => {
         ) : (
           <Image style={styles.headerImage} source={require('./assets/showblock.png')} />
         )}
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={onHistoryClick}
+        style={[styles.button, { marginLeft: 80, backgroundColor: 'yellow' }]}
+      >
+        <Image style={styles.headerImage} source={require('./assets/images.png')} />
       </TouchableOpacity>
     </View>
   )
