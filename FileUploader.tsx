@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Button, Text, Image, ScrollView } from 'react-native'
+import { View, Button, Text, Image, ScrollView, TouchableOpacity } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import { StyleSheet } from 'react-native'
 
@@ -42,7 +42,19 @@ const FileUploader = (props: PropsType) => {
 
   return (
     <View style={styles.container}>
-      <Button title="Выбрать изображение" onPress={pickImage} />
+      <View style={styles.imageButtonBlock}>
+        <TouchableOpacity
+          style={[styles.button, !files.length && { position: 'relative', left: 90 }]}
+          onPress={pickImage}
+        >
+          <Text style={{ fontSize: 16, color: 'white' }}>Add Images</Text>
+        </TouchableOpacity>
+        {files.length && (
+          <TouchableOpacity style={styles.button} onPress={() => setFiles([])}>
+            <Text style={{ fontSize: 16, color: 'white' }}>Delete image</Text>
+          </TouchableOpacity>
+        )}
+      </View>
       <ScrollView style={styles.imageContainer} horizontal={true}>
         <View style={styles.pickedImages}>
           {files.map((file, index) => (
@@ -59,6 +71,10 @@ const styles = StyleSheet.create({
     padding: 16,
     width: 360,
   },
+  imageButtonBlock: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   pickedImages: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -72,6 +88,17 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginRight: 10,
+  },
+  button: {
+    backgroundColor: 'rgb(107, 79, 187)',
+    width: 150,
+    height: 40,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'black',
+    borderStyle: 'solid',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 })
 
