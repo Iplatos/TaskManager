@@ -2,6 +2,7 @@ import React from 'react'
 import { View, Button, Text, Image, ScrollView, TouchableOpacity } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import { StyleSheet } from 'react-native'
+import { globalStyles } from './styles/styles'
 
 type FileType = {
   uri: string
@@ -12,10 +13,11 @@ type FileType = {
 type PropsType = {
   files: FileType[]
   setFiles: (files: FileType[]) => void
+  isDarkTheme: boolean
 }
 
 const FileUploader = (props: PropsType) => {
-  const { files, setFiles } = props
+  const { files, setFiles, isDarkTheme } = props
 
   const pickImage = async () => {
     try {
@@ -23,8 +25,6 @@ const FileUploader = (props: PropsType) => {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 1,
       })
-
-      console.log('Выбранное изображение:', result)
 
       if (!result.canceled && result.assets && result.assets[0]) {
         const file: FileType = {
@@ -36,7 +36,7 @@ const FileUploader = (props: PropsType) => {
         setFiles((prevFiles) => [...prevFiles, file])
       }
     } catch (error) {
-      console.error('Ошибка выбора изображения:', error)
+      console.error(error)
     }
   }
 
@@ -44,10 +44,16 @@ const FileUploader = (props: PropsType) => {
     <View style={styles.container}>
       <View style={styles.imageButtonBlock}>
         <TouchableOpacity
-          style={[styles.button, !files.length && { position: 'relative', left: 90 }]}
+          style={[
+            styles.button,
+            isDarkTheme
+              ? globalStyles.createTaskBlockDarkButtons
+              : globalStyles.createTaskBlockLightButtons,
+            !files.length && { position: 'relative', left: 90 },
+          ]}
           onPress={pickImage}
         >
-          <Text style={{ fontSize: 16, color: 'white' }}>Add Images</Text>
+          <Text style={isDarkTheme ? { color: 'white' } : { color: 'black' }}>Add Images</Text>
         </TouchableOpacity>
         {files.length && (
           <TouchableOpacity style={styles.button} onPress={() => setFiles([])}>

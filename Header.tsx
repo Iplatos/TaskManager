@@ -1,14 +1,24 @@
-import { Button, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { globalStyles } from './styles/styles'
 
 type HeaderPropsType = {
   showCreateTaskBlock: boolean
   setShowCreateTaskBlock: (showCreateTaskBlock: boolean) => void
   showHistory: boolean
   setShowHistory: (showHistory: boolean) => void
+  isDarkTheme: boolean
+  setIsDarkTheme: (isDarkTheme: boolean) => void
 }
 
 const Header = (props: HeaderPropsType) => {
-  const { setShowCreateTaskBlock, showCreateTaskBlock, showHistory, setShowHistory } = props
+  const {
+    setShowCreateTaskBlock,
+    showCreateTaskBlock,
+    showHistory,
+    setShowHistory,
+    isDarkTheme,
+    setIsDarkTheme,
+  } = props
   const onHistoryClick = () => {
     setShowHistory(!showHistory)
     setShowCreateTaskBlock(false)
@@ -19,7 +29,12 @@ const Header = (props: HeaderPropsType) => {
   }
 
   return (
-    <View style={styles.header}>
+    <View
+      style={[
+        styles.header,
+        isDarkTheme ? globalStyles.headerDarkMode : globalStyles.headerLightMode,
+      ]}
+    >
       <Text style={styles.h1}>To-do List</Text>
 
       <TouchableOpacity onPress={onButtonCreateTaskBlockClick} style={styles.button}>
@@ -32,11 +47,18 @@ const Header = (props: HeaderPropsType) => {
           <Image style={styles.headerImage} source={require('./assets/showblock.png')} />
         )}
       </TouchableOpacity>
-      <TouchableOpacity
-        onPress={onHistoryClick}
-        style={[styles.button, { marginLeft: 80, backgroundColor: 'yellow' }]}
-      >
+      <TouchableOpacity onPress={onHistoryClick} style={[styles.button, { marginLeft: 70 }]}>
         <Image style={styles.headerImage} source={require('./assets/images.png')} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => setIsDarkTheme(!isDarkTheme)}
+        style={[styles.button, { marginLeft: 140 }]}
+      >
+        {isDarkTheme ? (
+          <Image style={styles.headerImage} source={require('./assets/lightMode.png')} />
+        ) : (
+          <Image style={styles.headerImage} source={require('./assets/darkmode.png')} />
+        )}
       </TouchableOpacity>
     </View>
   )
@@ -45,8 +67,7 @@ const Header = (props: HeaderPropsType) => {
 const styles = StyleSheet.create({
   header: {
     padding: 5,
-
-    backgroundColor: 'red',
+    borderWidth: 1,
     alignItems: 'flex-end',
   },
   h1: {

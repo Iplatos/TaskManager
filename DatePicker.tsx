@@ -1,20 +1,17 @@
 import React, { useState } from 'react'
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
+import { getDateForButton } from './helpers/helpers'
+import { globalStyles } from './styles/styles'
 
 export type DatePickerPropsType = {
   date: Date
   setDate: (date: Date) => void
-}
-
-const getDateForButton = (date: Date) => {
-  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${
-    date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
-  }:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
+  isDarkTheme: boolean
 }
 
 export const DatePickerComponent = (props: DatePickerPropsType) => {
-  const { date, setDate } = props
+  const { date, setDate, isDarkTheme } = props
   const [show, setShow] = useState(false)
   const [mode, setMode] = useState<'date' | 'time'>('date')
 
@@ -35,8 +32,18 @@ export const DatePickerComponent = (props: DatePickerPropsType) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={showDateTimePicker}>
-        <Text style={{ fontSize: 16, color: 'white' }}>{getDateForButton(date)}</Text>
+      <TouchableOpacity
+        style={[
+          styles.button,
+          isDarkTheme
+            ? globalStyles.createTaskBlockDarkButtons
+            : globalStyles.createTaskBlockLightButtons,
+        ]}
+        onPress={showDateTimePicker}
+      >
+        <Text style={isDarkTheme ? { color: 'white' } : { color: 'black' }}>
+          {getDateForButton(date)}
+        </Text>
       </TouchableOpacity>
       {show && (
         <DateTimePicker
