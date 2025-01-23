@@ -54,3 +54,20 @@ export type FileType = {
   name: string
   type: string
 }
+export type MarkerLocation = {
+  latitude: number
+  longitude: number
+}
+export type MapForTaskProps = {
+  markerLocation: MarkerLocation
+  setMarkerLocation: (markerLocation: MarkerLocation) => void
+}
+
+export type HeaderPropsType = {
+  showCreateTaskBlock: boolean
+  setShowCreateTaskBlock: (showCreateTaskBlock: boolean) => void
+  showHistory: boolean
+  setShowHistory: (showHistory: boolean) => void
+  isDarkTheme: boolean
+  setIsDarkTheme: (isDarkTheme: boolean) => void
+}

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
-import { getDateForButton } from './helpers/helpers'
-import { globalStyles } from './styles/styles'
+import { getDateForButton } from '../helpers/helpers'
+import { globalStyles } from '../styles/styles'
 
 export type DatePickerPropsType = {
   date: Date

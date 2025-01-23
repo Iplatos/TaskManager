@@ -1,8 +1,8 @@
 import { FlatList, Image, ScrollView, Text, TouchableOpacity, View, StyleSheet } from 'react-native'
 import MapForCreatedTask from './MapForCreatedTasks'
-import { deadlineCorrectFormat } from './helpers/helpers'
-import { Task, TaskBlockProps } from './types/types'
-import { globalStyles } from './styles/styles'
+import { deadlineCorrectFormat } from '../helpers/helpers'
+import { TaskBlockProps } from '../types/types'
+import { globalStyles } from '../styles/styles'
 
 const TaskBlock = (props: TaskBlockProps) => {
   const { tasks, deleteTask, isDarkTheme } = props
@@ -41,7 +41,7 @@ const TaskBlock = (props: TaskBlockProps) => {
                     height: 40,
                     paddingBottom: 0,
                   }}
-                  source={require('./assets/location.png')}
+                  source={require('./../assets/location.png')}
                   resizeMode="contain"
                 />
               ) : (

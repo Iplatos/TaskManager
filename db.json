@@ -1,58 +1,23 @@
 {
   "tasks": [
     {
-      "id": "1737315389621",
-      "title": "Shhshshs",
-      "synced": false,
-      "file": [
-        {
-          "uri": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252FTaskManagerApp-7daf9a63-6aac-492d-a5da-d5923cac781d/ImagePicker/0cfbbdff-9f45-40a7-8562-aa4350b26e9d.jpeg",
-          "name": "1000006363.jpg",
-          "type": "image"
-        }
-      ]
-    },
-    {
-      "id": "1737316546292",
-      "title": "Fghh",
-      "synced": false,
-      "file": [
-        {
-          "uri": "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252FTaskManagerApp-7daf9a63-6aac-492d-a5da-d5923cac781d/ImagePicker/faf842ab-610e-48e2-a2b4-e27272432269.jpeg",
-          "name": "1000006363.jpg",
-          "type": "image"
-        }
-      ]
-    },
-    {
-      "id": "1737439781171",
-      "title": "",
-      "synced": false,
-      "file": [],
+      "id": "Fri Jan 31 2025 16:15:00 GMT+0300",
+      "title": "Приветик ",
+      "description": "Описание ",
+      "locationDescription": "Локация ",
       "location": {
-        "latitude": 55.5116812,
-        "longitude": 28.7009347
-      }
-    },
-    {
-      "id": "1737441886331",
-      "title": "",
-      "synced": false,
+        "latitude": 55.506227962657796,
+        "longitude": 28.747593350708485
+      },
+      "synced": true,
+      "updated": "Thu Jan 23 2025 14:59:59 GMT+0300",
+      "markerLocation": {
+        "latitude": 55.506227962657796,
+        "longitude": 28.747593350708485
+      },
       "file": [],
-      "location": {
-        "latitude": 55.321160784488676,
-        "longitude": 28.838939331471924
-      }
-    },
-    {
-      "id": "1737441972632",
-      "title": "Хз яе",
-      "synced": false,
-      "file": [],
-      "location": {
-        "latitude": 55.264872190436094,
-        "longitude": 29.021147824823856
-      }
+      "deleted": false,
+      "deadLine": "2025-01-31T13:15:00.000Z"
     }
   ]
 }

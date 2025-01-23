@@ -2,17 +2,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import * as Location from 'expo-location'
+import { MapForTaskProps } from '../types/types'
 
-export type MarkerLocation = {
-  latitude: string
-  longitude: string
-}
-type MapForTaskProps = {
-  markerLocation: MarkerLocation
-  setMarkerLocation: (markerLocation: MarkerLocation) => void
-}
-
-const MapForTask = (props: any) => {
+const MapForTask = (props: MapForTaskProps) => {
   const { markerLocation, setMarkerLocation } = props
 
   const [userLocation, setUserLocation] = useState<any>(null)

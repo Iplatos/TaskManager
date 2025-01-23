@@ -1,14 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { globalStyles } from './styles/styles'
-
-type HeaderPropsType = {
-  showCreateTaskBlock: boolean
-  setShowCreateTaskBlock: (showCreateTaskBlock: boolean) => void
-  showHistory: boolean
-  setShowHistory: (showHistory: boolean) => void
-  isDarkTheme: boolean
-  setIsDarkTheme: (isDarkTheme: boolean) => void
-}
+import { globalStyles } from '../styles/styles'
+import { HeaderPropsType } from '../types/types'
 
 const Header = (props: HeaderPropsType) => {
   const {
@@ -41,23 +33,23 @@ const Header = (props: HeaderPropsType) => {
         {showCreateTaskBlock ? (
           <Image
             style={styles.headerImage}
-            source={require('./assets/free-icon-close-151882.png')}
+            source={require('./../assets/free-icon-close-151882.png')}
           />
         ) : (
-          <Image style={styles.headerImage} source={require('./assets/showblock.png')} />
+          <Image style={styles.headerImage} source={require('./../assets/showblock.png')} />
         )}
       </TouchableOpacity>
       <TouchableOpacity onPress={onHistoryClick} style={[styles.button, { marginLeft: 70 }]}>
-        <Image style={styles.headerImage} source={require('./assets/images.png')} />
+        <Image style={styles.headerImage} source={require('./../assets/images.png')} />
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => setIsDarkTheme(!isDarkTheme)}
         style={[styles.button, { marginLeft: 140 }]}
       >
         {isDarkTheme ? (
-          <Image style={styles.headerImage} source={require('./assets/lightMode.png')} />
+          <Image style={styles.headerImage} source={require('./../assets/lightMode.png')} />
         ) : (
-          <Image style={styles.headerImage} source={require('./assets/darkmode.png')} />
+          <Image style={styles.headerImage} source={require('./../assets/darkmode.png')} />
         )}
       </TouchableOpacity>
     </View>

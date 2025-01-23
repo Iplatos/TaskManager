@@ -2,7 +2,7 @@ import React from 'react'
 import { View, Button, Text, Image, ScrollView, TouchableOpacity } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import { StyleSheet } from 'react-native'
-import { globalStyles } from './styles/styles'
+import { globalStyles } from '../styles/styles'
 
 type FileType = {
   uri: string
@@ -33,7 +33,7 @@ const FileUploader = (props: PropsType) => {
           type: 'image',
         }
 
-        setFiles((prevFiles) => [...prevFiles, file])
+        setFiles((prevFiles: any[]) => [...prevFiles, file])
       }
     } catch (error) {
       console.error(error)
@@ -88,7 +88,6 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     marginTop: 10,
-    backgroundColor: 'yellow',
   },
   image: {
     width: 100,

@@ -1,7 +1,7 @@
-import { FlatList, TouchableOpacity, Text, View } from 'react-native'
+import { FlatList, Text, View } from 'react-native'
 import { StyleSheet } from 'react-native'
-import { HistoryProps } from './types/types'
-import { globalStyles } from './styles/styles'
+import { HistoryProps } from '../types/types'
+import { globalStyles } from '../styles/styles'
 
 const History = (props: HistoryProps) => {
   const { tasks, isDarkTheme } = props
