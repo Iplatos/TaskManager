@@ -1,29 +1,18 @@
 import { StatusBar } from 'expo-status-bar'
-import {
-  Button,
-  FlatList,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native'
-import { useEffect, useState } from 'react'
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import NetInfo from '@react-native-community/netinfo'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
-import FileUploader from './FileUploader'
-import MapForTask from './MapForTask'
 import Header from './Header'
-import { DatePickerComponent } from './DatePicker'
-import MapForCreatedTask from './MapForCreatedTasks'
 import * as Notifications from 'expo-notifications'
 import TaskComponent from './TaskNotivication'
 import History from './History'
 import { scheduleNotification } from './notifications'
+import { globalStyles } from './styles/styles'
+import TaskCreatorBlock from './TaskCreatorBlock'
+import TaskBlock from './TaskBlock'
+import { Task } from './types/types'
 
 export default function App() {
   const [markerLocation, setMarkerLocation] = useState<any>(null)
@@ -37,6 +26,7 @@ export default function App() {
   const [date, setDate] = useState(new Date())
   const [showMap, setShowMap] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
+  const [isDarkTheme, setIsDarkTheme] = useState(false)
   useEffect(() => {
     loadTasksFromStorage()
     const unsubscribe = NetInfo.addEventListener(async (state) => {
@@ -49,7 +39,6 @@ export default function App() {
 
     return () => unsubscribe()
   }, [])
-  console.log('date меняется жу ', date.toISOString())
   useEffect(() => {
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
@@ -75,7 +64,7 @@ export default function App() {
         await syncDeletedTasksWithServer()
       }
     } catch (error) {
-      console.error('Ошибка удаления задачи:', error)
+      console.error(error)
     }
   }
 
@@ -94,23 +83,22 @@ export default function App() {
       setTasks(updatedTasks)
       await saveTasksToStorage(updatedTasks)
     } catch (error) {
-      console.error('Ошибка синхронизации удалённых задач:', error)
+      console.error(error)
     }
   }
   const deleteTaskFromServer = async (taskId: string) => {
     try {
       await axios.delete(`http://192.168.0.115:3000/tasks/${taskId}`)
-      console.log(`Задача с ID ${taskId} успешно удалена с сервера.`)
     } catch (error) {
-      console.error(`Ошибка при удалении задачи с ID ${taskId}:`, error)
+      console.error(error)
       throw error
     }
   }
-  const saveTasksToStorage = async (tasks: any[]) => {
+  const saveTasksToStorage = async (tasks: Task[]) => {
     try {
       await AsyncStorage.setItem('tasks', JSON.stringify(tasks))
     } catch (error) {
-      console.error('Ошибка сохранения задач в AsyncStorage:', error)
+      console.error(error)
     }
   }
 
@@ -119,11 +107,9 @@ export default function App() {
       const storedTasks = await AsyncStorage.getItem('tasks')
       if (storedTasks) {
         const parsedTasks = JSON.parse(storedTasks)
-        console.log('Задачи из AsyncStorage:', parsedTasks)
 
         setTasks(parsedTasks.filter((task) => !task.deleted))
       } else {
-        console.log('Нет задач в AsyncStorage')
         setTasks([])
       }
     } catch (error) {
@@ -154,19 +140,11 @@ export default function App() {
       await syncTasksWithServer()
     }
 
-    console.log(`Дедлайн задачи: ${task.deadLine}`)
-    console.log(`Текущее время: ${new Date().toISOString()}`)
-
     const taskDate = new Date(task.deadLine)
     const notificationTime = new Date(taskDate.getTime() - 30 * 60000)
 
     if (notificationTime > new Date()) {
       await scheduleNotification(task.title, notificationTime)
-      console.log(`Уведомление для задачи "${task.title}" запланировано на:`, notificationTime)
-    } else {
-      console.log(
-        `Уведомление для задачи "${task.title}" не запланировано, так как время уже прошло.`
-      )
     }
 
     setTaskTitle('')
@@ -174,6 +152,7 @@ export default function App() {
     setLocationDescription('')
     setDate(new Date())
     setFiles([])
+    setShowMap(false)
   }
 
   const saveTaskToServer = async (task: any) => {
@@ -205,12 +184,6 @@ export default function App() {
       console.error(error)
     }
   }
-  const deadlineCorrectFormat = (isoString: string) => {
-    const dateFromISO = new Date(isoString)
-    return `${dateFromISO.getDate()}/${dateFromISO.getMonth() + 1}/${dateFromISO.getFullYear()} ${
-      dateFromISO.getHours() < 10 ? '0' + dateFromISO.getHours() : dateFromISO.getHours()
-    }:${dateFromISO.getMinutes() < 10 ? '0' + dateFromISO.getMinutes() : dateFromISO.getMinutes()}`
-  }
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
@@ -219,144 +192,41 @@ export default function App() {
         setShowCreateTaskBlock={setShowCreateTaskBlock}
         setShowHistory={setShowHistory}
         showHistory={showHistory}
+        isDarkTheme={isDarkTheme}
+        setIsDarkTheme={setIsDarkTheme}
       />
       <TaskComponent tasks={tasks} />
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          isDarkTheme ? globalStyles.mainDarkMode : globalStyles.mainLightMode,
+        ]}
+      >
         {showCreateTaskBlock && (
-          <View
-            style={{
-              backgroundColor: 'yellow',
-
-              paddingTop: 30,
-              borderRadius: 5,
-            }}
-          >
-            <TextInput
-              placeholder="Add title"
-              value={taskTitle}
-              onChangeText={setTaskTitle}
-              style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
-            />
-            <TextInput
-              placeholder="Add description"
-              placeholderTextColor={'red'}
-              value={taskDescription}
-              onChangeText={setTaskDescription}
-              style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
-            />
-            <TextInput
-              placeholder="Add location"
-              value={locationDescription}
-              onChangeText={setLocationDescription}
-              style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
-            />
-
-            <View
-              style={{
-                backgroundColor: 'yellow',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100%',
-                paddingRight: 20,
-                height: 55,
-              }}
-            >
-              <DatePickerComponent date={date} setDate={setDate} />
-              <TouchableOpacity style={styles.button} onPress={() => setShowMap(!showMap)}>
-                <Text style={{ fontSize: 16, color: 'white' }}>
-                  {showMap ? 'Hide Map' : 'Show Map'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <FileUploader files={files} setFiles={setFiles} />
-            <TouchableOpacity
-              style={[styles.button, { position: 'relative', left: 105 }]}
-              onPress={addTask}
-            >
-              <Text style={{ fontSize: 16, color: 'white' }}>Add task</Text>
-            </TouchableOpacity>
-
-            {showMap && (
-              <MapForTask markerLocation={markerLocation} setMarkerLocation={setMarkerLocation} />
-            )}
-          </View>
+          <TaskCreatorBlock
+            date={date}
+            files={files}
+            isDarkTheme={isDarkTheme}
+            locationDescription={locationDescription}
+            setDate={setDate}
+            setFiles={setFiles}
+            setLocationDescription={setLocationDescription}
+            setShowMap={setShowMap}
+            setTaskDescription={setTaskDescription}
+            setTaskTitle={setTaskTitle}
+            showMap={showMap}
+            taskDescription={taskDescription}
+            taskTitle={taskTitle}
+            addTask={addTask}
+            setMarkerLocation={setMarkerLocation}
+            markerLocation={markerLocation}
+          />
         )}
 
         {!showHistory ? (
-          <FlatList
-            data={tasks}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View
-                key={item.id}
-                style={{
-                  marginBottom: 10,
-                  backgroundColor: 'red',
-                  borderWidth: 1,
-                  borderColor: 'black',
-                  borderStyle: 'solid',
-                  borderRadius: 5,
-                }}
-              >
-                <Text style={{ textAlign: 'center', marginVertical: 10 }}>Title:{item.title}</Text>
-                <Text style={{ marginVertical: 5, marginLeft: 20 }}>
-                  Description:{item.description}
-                </Text>
-                <Text style={{ marginVertical: 5, marginLeft: 20 }}>
-                  Location:{item.locationDescription}
-                </Text>
-
-                <Text style={{ marginVertical: 5, marginLeft: 20, textAlign: 'center' }}>
-                  {item.synced ? 'Synchronized' : 'Not Synchronized'}
-                </Text>
-                <Text style={{ marginVertical: 5, marginLeft: 20 }}>
-                  Deadline: {deadlineCorrectFormat(item.deadLine)}
-                </Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <Text style={{ marginVertical: 10, marginLeft: 20 }}>Location on Map :</Text>
-                  {item.markerLocation ? (
-                    <Image
-                      style={{
-                        width: 40,
-                        height: 40,
-                        paddingBottom: 0,
-                      }}
-                      source={require('./assets/location.png')}
-                      resizeMode="contain"
-                    />
-                  ) : (
-                    <Text style={{ marginVertical: 10, marginLeft: 20 }}>No</Text>
-                  )}
-                </View>
-
-                {item.file && item.file.length > 0 && item.file[0].type === 'image' ? (
-                  <ScrollView horizontal={true} style={{ marginTop: 10 }}>
-                    {item.file.map((file, index) => (
-                      <Image
-                        key={index}
-                        style={{
-                          width: 100,
-                          height: 100,
-                          marginRight: 10,
-                        }}
-                        source={{ uri: file.uri }}
-                        resizeMode="contain"
-                      />
-                    ))}
-                  </ScrollView>
-                ) : (
-                  <Text>No Picture</Text>
-                )}
-                <MapForCreatedTask location={item.location} />
-                <TouchableOpacity onPress={() => deleteTask(item.id)}>
-                  <Text>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          />
+          <TaskBlock isDarkTheme={isDarkTheme} deleteTask={deleteTask} tasks={tasks} />
         ) : (
-          <History tasks={tasks} />
+          <History isDarkTheme={isDarkTheme} tasks={tasks} />
         )}
         {!isConnected && <Text style={{ color: 'red' }}>Connection error</Text>}
         <StatusBar style="auto" />
@@ -364,9 +234,24 @@ export default function App() {
     </SafeAreaView>
   )
 }
-////npx json-server --watch db.json --port 3000
 
 const styles = StyleSheet.create({
+  createTaskBlock: {
+    zIndex: 10,
+    top: 10,
+    alignItems: 'center',
+    paddingTop: 30,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'black',
+    position: 'absolute',
+  },
+  createTaskBlockInput: {
+    borderWidth: 1,
+    width: '90%',
+    marginBottom: 10,
+    padding: 8,
+  },
   safeAreaContainer: {
     flex: 1,
     paddingTop: 30,
@@ -377,17 +262,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  button: {
-    backgroundColor: 'rgb(107, 79, 187)',
-    width: 150,
-    height: 40,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: 'black',
-    borderStyle: 'solid',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 })
