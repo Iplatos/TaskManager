@@ -3,6 +3,15 @@ import { View, Text, StyleSheet } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
 import * as Location from 'expo-location'
 
+export type MarkerLocation = {
+  latitude: string
+  longitude: string
+}
+type MapForTaskProps = {
+  markerLocation: MarkerLocation
+  setMarkerLocation: (markerLocation: MarkerLocation) => void
+}
+
 const MapForTask = (props: any) => {
   const { markerLocation, setMarkerLocation } = props
 

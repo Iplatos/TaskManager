@@ -10,27 +10,24 @@ export const registerForPushNotificationsAsync = async () => {
   }
 
   if (finalStatus !== 'granted') {
-    alert('Разрешение на уведомления не предоставлено!')
+    alert('Notification permission not granted!')
     return null
   }
 
   const token = (await Notifications.getExpoPushTokenAsync()).data
-  console.log('Push token:', token)
   return token
 }
 
 export const scheduleNotification = async (title, date) => {
-  console.log(`Запланировать уведомление: "${title}" на ${date.toISOString()}`)
   try {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: title,
-        body: 'Напоминание о задаче',
+        body: 'task reminder',
       },
-      trigger: date, // Проверка
+      trigger: date,
     })
-    console.log('Уведомление успешно запланировано')
   } catch (error) {
-    console.error('Ошибка при планировании уведомления:', error)
+    console.error(error)
   }
 }
