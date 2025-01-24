@@ -25,6 +25,7 @@ export const globalStyles = StyleSheet.create({
   createTaskBlockDarkInput: {
     backgroundColor: 'black',
     borderColor: 'white',
+    color: 'white',
   },
   createTaskBlockLightInput: {
     backgroundColor: 'white',

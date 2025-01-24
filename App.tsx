@@ -29,6 +29,7 @@ export default function App() {
   const [isDarkTheme, setIsDarkTheme] = useState(false)
   useEffect(() => {
     loadTasksFromStorage()
+
     const unsubscribe = NetInfo.addEventListener(async (state) => {
       setIsConnected(state.isConnected ?? false)
       if (state.isConnected) {
@@ -38,7 +39,7 @@ export default function App() {
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [isConnected])
   useEffect(() => {
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
@@ -107,7 +108,6 @@ export default function App() {
       const storedTasks = await AsyncStorage.getItem('tasks')
       if (storedTasks) {
         const parsedTasks = JSON.parse(storedTasks)
-
         setTasks(parsedTasks.filter((task) => !task.deleted))
       } else {
         setTasks([])
@@ -134,17 +134,10 @@ export default function App() {
 
     const updatedTasks = [...tasks, task]
     setTasks(updatedTasks)
-    saveTasksToStorage(updatedTasks)
+    await saveTasksToStorage(updatedTasks)
 
     if (isConnected) {
       await syncTasksWithServer()
-    }
-
-    const taskDate = new Date(task.deadLine)
-    const notificationTime = new Date(taskDate.getTime() - 30 * 60000)
-
-    if (notificationTime > new Date()) {
-      await scheduleNotification(task.title, notificationTime)
     }
 
     setTaskTitle('')

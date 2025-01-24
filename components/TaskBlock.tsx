@@ -6,6 +6,8 @@ import { globalStyles } from '../styles/styles'
 
 const TaskBlock = (props: TaskBlockProps) => {
   const { tasks, deleteTask, isDarkTheme } = props
+  console.log('taskBlock', tasks)
+
   return (
     <View>
       <FlatList
@@ -99,8 +101,8 @@ const styles = StyleSheet.create({
   },
   taskElement: {
     marginBottom: 10,
-    backgroundColor: 'green',
     borderWidth: 1,
+    width: 350,
     borderColor: 'black',
     borderStyle: 'solid',
     borderRadius: 5,
