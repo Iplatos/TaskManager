@@ -6,7 +6,6 @@ import { globalStyles } from '../styles/styles'
 
 const TaskBlock = (props: TaskBlockProps) => {
   const { tasks, deleteTask, isDarkTheme } = props
-  console.log('taskBlock', tasks)
 
   return (
     <View>
